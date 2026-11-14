@@ -1,1 +1,1 @@
-# IDS-project
+# SkinMatch: Skin-Type-Based Skincare Recommender
