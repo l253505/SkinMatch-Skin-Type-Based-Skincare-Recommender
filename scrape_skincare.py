@@ -71,6 +71,28 @@ SITES = {
                  "manual_urls": [], "currency": "PKR"},
     "Blissful": {"base": "https://shopblissfulbeauty.com", "shopify": True, "collection": "",
                  "manual_urls": [], "currency": "PKR"},
+
+    # La Roche-Posay (US site). Strong acne range (Effaclar), and every page lists "Skin Type:".
+    # The listing pages load most products with JavaScript, so product URLs come from the sitemap;
+    # the seeds are only a fallback. Product URLs end in a barcode number: ...-3337875926065.html
+    "La Roche-Posay": {"base": "https://www.laroche-posay.us", "manual_urls": [], "currency": "USD",
+                       "seeds": ["https://www.laroche-posay.us/our-products/face/acne-products",
+                                 "https://www.laroche-posay.us/our-products/acne-oily-skin",
+                                 "https://www.laroche-posay.us/our-products/product-line/effaclar",
+                                 "https://www.laroche-posay.us/our-products/face"],
+                       "product_re": r"^/our-products/.+-\d{8,14}\.html$"},
+
+    # Pakistani brands with acne / oil-control ranges (Shopify shops; prices in PKR).
+    # collection "" = the whole shop, so the recommender also gets their non-acne products.
+    # If ingredient_count comes back 0 for a shop, set "render_ingredients": True (needs Playwright).
+    "BnB Derma":  {"base": "https://bnbderma.com", "shopify": True, "collection": "",
+                   "manual_urls": [], "currency": "PKR"},
+    "SkinFactor": {"base": "https://www.skinfactor.pk", "shopify": True, "collection": "",
+                   "manual_urls": [], "currency": "PKR"},
+    "Mazton":     {"base": "https://shopmazton.com", "shopify": True, "collection": "",
+                   "manual_urls": [], "currency": "PKR"},
+    "Accufix":    {"base": "https://accufixcosmetics.com", "shopify": True, "collection": "",
+                   "manual_urls": [], "currency": "PKR"},
 }
 # INKEEDecoder (formerly INCIDecoder, same site): ingredient lists for many brands.
 # It has NO price, rating or skin-type field, so skin_types stays mostly empty for these rows.
@@ -98,7 +120,7 @@ USER_AGENT = "Mozilla/5.0 (student project; DS2001 coursework; contact: your_ema
 
 HEADERS = {"User-Agent": USER_AGENT, "Accept-Language": "en-US,en;q=0.9"}
 URL_HINTS = ("product", "/p/", "/shop/", "/skincare/", "/products/")
-SKIP_URL_PARTS = ("/es/", "/sitecore", "/search", "/cart", "/login", "/account")
+SKIP_URL_PARTS = ("/es/", "/es-us/", "/fr-ca/", "/sitecore", "/search", "/cart", "/login", "/account")
 
 FIELDS = ["brand", "name", "category", "ingredients", "ingredient_count", "skin_types",
           "helps_with", "price_usd", "rating", "review_count", "url", "currency", "source"]
@@ -108,16 +130,37 @@ FIELDS = ["brand", "name", "category", "ingredients", "ingredient_count", "skin_
 
 # ---------------- networking helpers ----------------
 def get(url, tries=3):
-    """GET with retries; prints the FULL error so we can see what went wrong."""
+    """GET with retries; prints the FULL error so we can see what went wrong.
+    429 (too many requests): waits as long as the site asks (Retry-After), at most 2 minutes,
+    then tries again. If it is still 429 after that, the response is returned and the brand stops."""
     last = None
     for i in range(tries):
         try:
-            return requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+            r = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
         except requests.RequestException as e:
             last = e
             time.sleep(2 * (i + 1))
+            continue
+        if r.status_code == 429 and i < tries - 1:
+            ra = r.headers.get("Retry-After", "")
+            wait = min(int(ra) if ra.isdigit() else 30 * (i + 1), 120)
+            print(f"    429 too many requests: waiting {wait}s before retrying {url}")
+            time.sleep(wait)
+            continue
+        return r
     print(f"    request error after {tries} tries: {url}\n      {type(last).__name__}: {str(last)[-300:]}")
     return None
+
+
+STATUS_HINT = {403: "blocked: the site refuses automated requests", 401: "login required",
+               404: "not found (no public products.json / wrong URL)", 429: "too many requests: wait and retry later",
+               430: "Shopify rate limit / bot block", 503: "site busy or bot protection"}
+
+
+def why(r):
+    if r is None:
+        return "no connection (internet/DNS problem, or the site is unreachable from your network)"
+    return f"status {r.status_code}: {STATUS_HINT.get(r.status_code, 'unexpected response')}"
 
 
 def load_robots(base):
@@ -155,7 +198,8 @@ def _discover(base, rp):
             continue
         seen.add(sm)
         r = get(sm)
-        if not r or r.status_code != 200:
+        if r is None or r.status_code != 200:
+            print(f"  sitemap {sm} -> {why(r)}")
             continue
         for loc in re.findall(r"<loc>\s*(.*?)\s*</loc>", r.text):
             if loc.endswith(".xml") or ".xml?" in loc:
@@ -178,11 +222,14 @@ def crawl_seed_links(cfg, rp):
         r = get(seed)
         time.sleep(DELAY_SECONDS)
         if r is None or r.status_code != 200:
+            print(f"  listing page {seed} -> {why(r)}")
             continue
+        before = len(found)
         for a in BeautifulSoup(r.text, "lxml").find_all("a", href=True):
             link = urljoin(seed, a["href"]).split("#")[0].split("?")[0]
             if host in urlparse(link).netloc and pat.search(urlparse(link).path):
                 found.append(link)
+        print(f"  listing page {seed}: {len(found) - before} product links")
     return list(dict.fromkeys(found))
 
 
@@ -199,7 +246,7 @@ def shopify_rows(brand, cfg, rp, done):
         r = get(url)
         time.sleep(DELAY_SECONDS)
         if r is None or r.status_code != 200:
-            print(f"  products.json not available (status {r.status_code if r else 'error'})")
+            print(f"  products.json not available -> {why(r)}")
             break
         try:
             prods = r.json().get("products", [])
@@ -219,6 +266,7 @@ def shopify_rows(brand, cfg, rp, done):
             tags = pr.get("tags") or []
             tag_text = " ".join(tags if isinstance(tags, list) else str(tags).split(","))
             skin = [k for k, pat in SKIN_PATTERNS.items() if re.search(pat, (text + " " + tag_text).lower())]
+            skin = add_acne_prone(skin, pr.get("title", ""), tag_text, ", ".join(ings) if ings else "")
             variants = pr.get("variants") or [{}]
             rows.append({
                 "brand": brand, "name": pr.get("title", "").strip(),
@@ -430,9 +478,26 @@ SKIN_PATTERNS = {
     "combination": r"\bcombination\b",
     "sensitive": r"\bsensitive\b",
     "normal": r"\bnormal\b",
-    "acne-prone": r"acne[- ]prone|blemish[- ]prone",
+    "acne-prone": r"acne[- ]prone|blemish[- ]prone|breakout[- ]prone|prone to (?:acne|breakouts|blemishes)",
     "all": r"all skin types|every skin type",
 }
+
+
+# A product is tagged acne-prone at scrape time only when its NAME or 'helps with' text is clearly
+# about acne, or it contains a strong acne active. Salicylic acid alone is NOT enough: it also shows
+# up in anti-aging peels, radiance masks and as a minor ingredient.
+ACNE_TEXT = r"\bacne\b|blemish|breakout|pimple|\bspot treat|effaclar"
+ACNE_STRONG_ACTIVES = r"benzoyl peroxide|adapalene"
+
+
+def add_acne_prone(skin, name="", helps="", ingredients=""):
+    """Return the skin-type list with 'acne-prone' added when the product is clearly for acne."""
+    skin = list(skin)
+    if "acne-prone" in skin:
+        return skin
+    if re.search(ACNE_TEXT, f"{name} {helps}".lower()) or re.search(ACNE_STRONG_ACTIVES, (ingredients or "").lower()):
+        skin.append("acne-prone")
+    return skin
 
 
 def extract_tagline(soup, label):
@@ -441,6 +506,25 @@ def extract_tagline(soup, label):
         txt = li.get_text(" ", strip=True)
         if txt.lower().startswith(label.lower()):
             return txt[len(label):].strip(" :")
+    return ""
+
+
+def labelled_text(soup, label_re, max_lines=8):
+    """Lines right after a 'Label:' heading, e.g. 'Skin Type:' -> 'Acne-prone skin; Oily skin'.
+    Needs the colon, so menu headings like 'Shop by Skin Type' are not picked up.
+    Stops at the next heading (a line ending in ':' or written in CAPITALS)."""
+    lines = [l.strip() for l in soup.get_text("\n", strip=True).split("\n") if l.strip()]
+    for i, l in enumerate(lines):
+        m = re.match(rf"(?i)^{label_re}\s*:\s*(.*)$", l)
+        if not m:
+            continue
+        found = [m.group(1)] if m.group(1) else []
+        for nxt in lines[i + 1:i + 1 + max_lines]:
+            if nxt.endswith(":") or (nxt.isupper() and len(nxt) > 3) or len(nxt) > 60:
+                break
+            found.append(nxt)
+        if found:
+            return "; ".join(found)
     return ""
 
 
@@ -507,6 +591,8 @@ def extract_skin_types(soup, ld):
         el = soup.select_one("p.suitedTo")
         if el:
             made_for = re.sub(r"(?i)^suited for", "", el.get_text(" ", strip=True)).strip(" :")
+    if not made_for:
+        made_for = labelled_text(soup, r"skin types?")      # e.g. La Roche-Posay "Skin Type: Acne-prone skin, Oily skin"
     if made_for:
         t = made_for.lower()
         hit = [k for k, pat in SKIN_PATTERNS.items() if re.search(pat, t)]
@@ -565,15 +651,18 @@ def parse_product(html, url, brand, currency="USD"):
         return None                      # not a product page (category, article, etc.)
     ld = ld or {}
     name = ld.get("name") or (soup.h1.get_text(strip=True) if soup.h1 else "")
-    skin = extract_skin_types(soup, ld)
+    name = htmllib.unescape(str(name)).strip()
+    helps = extract_tagline(soup, "Helps With") or _targets(soup) or labelled_text(soup, r"skin concerns?")
+    ing_text = ", ".join(ingredients) if ingredients else ""
+    skin = add_acne_prone(extract_skin_types(soup, ld), name, helps, ing_text)
     return {
         "brand": brand,
-        "name": htmllib.unescape(str(name)).strip(),
+        "name": name,
         "category": extract_category(url, ld, html),
-        "ingredients": ", ".join(ingredients) if ingredients else "",
+        "ingredients": ing_text,
         "ingredient_count": len(ingredients) if ingredients else 0,
         "skin_types": "|".join(skin),
-        "helps_with": extract_tagline(soup, "Helps With") or _targets(soup),
+        "helps_with": helps,
         **extract_numbers(soup, ld),
         "url": url,
         "currency": currency,
@@ -618,6 +707,7 @@ def parse_inkee(html, url, brand_label):
     tags = [h.get_text(strip=True).lstrip("#") for h in soup.select(".hashtags .hashtag")]
     skin = [k for k, pat in SKIN_PATTERNS.items() if re.search(pat, (desc + " " + " ".join(tags)).lower())]
     name = name_el.get_text(strip=True)
+    skin = add_acne_prone(skin, name, " ".join(tags), ", ".join(ings))
     return {"brand": brand_label, "name": name, "category": guess_category(name),
             "ingredients": ", ".join(ings), "ingredient_count": len(ings),
             "skin_types": "|".join(skin), "helps_with": "; ".join(tags),
@@ -665,6 +755,21 @@ def scrape_inkee(done):
 
 
 # ---------------- storage ----------------
+def _skip_file(brand):
+    return f"not_products_{brand.replace(' ', '_')}.txt"
+
+
+def load_not_products(brand):
+    """URLs already found NOT to be product pages (category pages etc.) on an earlier run."""
+    f = _skip_file(brand)
+    return set(open(f, encoding="utf-8").read().split()) if os.path.exists(f) else set()
+
+
+def remember_not_product(brand, url):
+    with open(_skip_file(brand), "a", encoding="utf-8") as f:
+        f.write(url + "\n")
+
+
 def load_done_urls():
     if not os.path.exists(OUTPUT_CSV):
         return set()
@@ -700,6 +805,256 @@ def append_row(row):
         w.writerow(row)
 
 
+# ---------------- post-processing (run on the merged CSV) ----------------
+ING_RULES = {
+    "Signs of Congestion":     r"salicylic acid|benzoyl peroxide|sulfur|tea tree|azelaic acid|zinc pca|willow bark",
+    "Signs of Aging":          r"retinol|retinal|retinyl|bakuchiol|peptide|palmitoyl|acetyl hexapeptide|matrixyl|adenosine",
+    "Dryness":                 r"ceramide|shea butter|squalane|petrolatum|urea|cholesterol",
+    "Dehydration":             r"hyaluronic acid|sodium hyaluronate|polyglutamic",
+    "Dullness":                r"ascorbic acid|ascorbyl|vitamin c|glycolic acid|lactic acid|licorice|glycyrrhiza",
+    "Uneven Skin Tone":        r"niacinamide|tranexamic|alpha[- ]arbutin|arbutin|kojic|ascorbyl glucoside",
+    "Textural Irregularities": r"glycolic acid|lactic acid|mandelic acid|gluconolactone|salicylic acid|papain|bromelain",
+    "Look of Redness":         r"centella|madecassoside|allantoin|bisabolol|colloidal oatmeal|avena sativa|aloe barbadensis",
+    "Antioxidant Support":     r"tocopherol|resveratrol|ferulic|green tea|camellia sinensis|ubiquinone|coenzyme",
+    "Barrier Support":         r"ceramide|cholesterol|phytosphingosine|fatty acid",
+    "Oil Control":             r"kaolin|bentonite|zinc pca|charcoal",
+}
+NAME_RULES = {
+    "Cleansing":                r"cleanser|cleansing|face wash|foam|micellar|makeup remov",
+    "Sun Protection":           r"\bspf\b|sunscreen|sun protect|uv",
+    "Signs of Aging":           r"anti[- ]?aging|age|wrinkle|firm|lift|retinol|youth|repair",
+    "Dryness":                  r"moistur|hydrat|cream|balm|rich|nourish",
+    "Dullness":                 r"brighten|radiance|glow|vitamin c|illuminat",
+    "Signs of Congestion":      r"acne|blemish|pore|clarif|purif|detox|clear",
+    "Textural Irregularities":  r"exfoli|peel|resurfac|polish|scrub|aha|bha",
+    "Look of Redness":          r"calm|sooth|redness|sensitive|relief",
+    "Puffiness & Dark Circles": r"eye",
+    "Oil Control":              r"matte|mattif|oil[- ]control|oil[- ]free",
+}
+
+
+def _guess_helps(row):
+    import pandas as pd
+    text = f"{row['name']} {row['category']}".lower()
+    ing = str(row["ingredients"]).lower() if pd.notna(row["ingredients"]) else ""
+    top = ", ".join(ing.split(", ")[:20])
+    found = [c for c, p in NAME_RULES.items() if re.search(p, text)]
+    found += [c for c, p in ING_RULES.items() if c not in found and re.search(p, top)]
+    return "; ".join(found[:4]) or pd.NA
+
+
+def fill_helps_with(src, out):
+    """Fill empty 'helps_with' from the name/category and the first 20 ingredients.
+    Adds 'helps_with_source' = site / derived so you can tell guessed values apart."""
+    import pandas as pd
+    df = pd.read_csv(src)
+    empty = df["helps_with"].isna() | (df["helps_with"].astype(str).str.strip() == "")
+    df["helps_with_source"] = "site"
+    df.loc[empty, "helps_with"] = df[empty].apply(_guess_helps, axis=1)
+    df.loc[empty, "helps_with_source"] = "derived"
+    df.loc[df["helps_with"].isna(), "helps_with_source"] = pd.NA
+    df.to_csv(out, index=False)
+    print("helps_with filled:", int((empty & df.helps_with.notna()).sum()), "of", int(empty.sum()),
+          "| still empty:", int(df.helps_with.isna().sum()))
+    return df
+
+
+NON_FACE = r"hair|shampoo|conditioner|lash|body|baby|lip|foundation|diabetic"
+# Extra acne signals (less direct than the name saying 'acne'):
+OILY_NAME = r"clarif|oil[- ]free|mattif|\bpores?\b|pore[- ]"     # name aimed at oily / congested skin
+NOT_OILY_NAME = r"radiance|glow|brighten|illuminat"               # 'clarifying radiance toner' is not for acne
+EYE = r"\beye"                                                     # eye creams are not acne products
+OIL_CONTROL_ING = r"salicylic|azelaic|sulfur|niacinamide|zinc|kaolin|bentonite|charcoal|clay"
+ACNE_MILD_ACTIVES = r"salicylic|azelaic|sulfur"
+
+
+def tag_acne_prone(src, out=None, review_out="acne_review_candidates.csv", decisions=None):
+    """Add 'acne-prone' to skin_types on the merged CSV.
+
+    Tagged automatically (clear cases): name/category mentions acne, blemish, breakout, pimple or
+    spot treatment; site-written 'helps_with' mentions acne; or it contains benzoyl peroxide / adapalene.
+    Only helps_with written by the SITE counts: derived helps_with text is our own guess.
+
+    Borderline (written to review_out, NOT tagged): 'Signs of Congestion' or salicylic/azelaic/sulfur.
+    Fill the review file's 'add_acne_prone' column with yes/no and pass it back as decisions=...
+    to apply your choices. Safe to run again: already-tagged rows are left alone."""
+    import pandas as pd
+    out = out or src
+    # Your yes/no answers are never lost: if no decisions file is given, use acne_review_decisions.csv,
+    # or the review file itself when it already has answers in it.
+    if decisions is None:
+        for cand in ("acne_review_decisions.csv", review_out):
+            if cand and os.path.exists(cand):
+                d0 = pd.read_csv(cand, dtype=str)
+                c0 = next((c for c in d0.columns if c.startswith("add_acne_prone")), None)
+                if c0 and d0[c0].fillna("").str.strip().ne("").any():
+                    decisions = cand
+                    print(f"  using your earlier yes/no answers from {cand}")
+                    break
+    if decisions and os.path.exists(decisions) and decisions == review_out:
+        import shutil                          # keep a copy before the review file is rewritten
+        shutil.copy(decisions, "acne_review_decisions.csv")
+        decisions = "acne_review_decisions.csv"
+    df = pd.read_csv(src)
+    low = lambda c: df[c].fillna("").astype(str).str.lower() if c in df else pd.Series("", index=df.index)
+    name, cat, ing, st = low("name"), low("category"), low("ingredients"), low("skin_types")
+    helps = low("helps_with")
+    site_helps = helps.where(low("helps_with_source") != "derived", "") if "helps_with_source" in df else helps
+
+    already = st.str.contains("acne")
+    non_face = cat.str.contains(NON_FACE)
+    by_name = name.str.contains(ACNE_TEXT) | cat.str.contains(r"\bacne\b")
+    by_helps = site_helps.str.contains(ACNE_TEXT)
+    by_strong = ing.str.contains(ACNE_STRONG_ACTIVES)
+    congest = helps.str.contains("congestion")
+    mild = ing.str.contains(ACNE_MILD_ACTIVES)
+
+    # Products labelled ONLY for dry and/or sensitive skin are never auto-tagged by the weaker signals.
+    types = st.str.replace("acne-prone", "")
+    dry_only = types.str.contains(r"dry|sensitive") & ~types.str.contains(r"oily|combination|normal|\ball\b")
+    by_pores = site_helps.str.contains(r"\bpores?\b")                        # Sephora: 'Good for: Pores'
+    by_oily_name = name.str.contains(OILY_NAME) & ~name.str.contains(NOT_OILY_NAME)
+    oil_ing = ing.str.contains(OIL_CONTROL_ING)
+    usable = ~dry_only & ~name.str.contains(EYE) & ~cat.str.contains(EYE)
+    # two signals must agree: an oily-skin name AND (pores tag or an oil-control / acne ingredient)
+    weak = by_oily_name & (by_pores | oil_ing) & usable
+
+    clear = (by_name | by_helps | by_strong | weak) & ~already & ~non_face
+    one_signal = (by_pores | by_oily_name) & usable          # only one weak signal: you decide
+    review = (congest | mild | one_signal) & ~clear & ~already & ~non_face
+
+    # apply yes/no decisions from a filled-in review file
+    approved = pd.Series(False, index=df.index)
+    if decisions and os.path.exists(decisions):
+        d = pd.read_csv(decisions)
+        col = next(c for c in d.columns if c.startswith("add_acne_prone"))
+        yes = d[d[col].astype(str).str.strip().str.lower().isin(["yes", "y", "1", "true"])]
+        keys = set(yes.brand.str.lower().str.strip() + "|" + yes.name.str.lower().str.strip())
+        key = df.brand.astype(str).str.lower().str.strip() + "|" + name.str.strip()
+        approved = key.isin(keys) & ~already
+        decided = d[d[col].fillna("").astype(str).str.strip() != ""]       # blank = not decided yet
+        review &= ~key.isin(set(decided.brand.str.lower().str.strip() + "|" + decided.name.str.lower().str.strip()))
+
+    to_tag = clear | approved
+    def add(v):
+        v = "" if pd.isna(v) or str(v).strip() == "" else str(v)
+        return v + "|acne-prone" if v else "acne-prone"
+    df.loc[to_tag, "skin_types"] = df.loc[to_tag, "skin_types"].apply(add)
+    df.to_csv(out, index=False)
+
+    def why(i):
+        r = []
+        if congest[i]: r.append("helps_with: signs of congestion")
+        if mild[i]: r.append("salicylic/azelaic/sulfur in ingredients")
+        if by_pores[i]: r.append("Sephora: good for pores")
+        if by_oily_name[i]: r.append("name: clarifying/oil-free/mattifying/pore")
+        return "; ".join(r)
+    rv = df.loc[review, ["brand", "name", "category", "skin_types", "helps_with"]].copy()
+    rv["why_flagged"] = [why(i) for i in rv.index]
+    rv["likelihood"] = ["higher" if (congest[i] and mild[i]) or (by_pores[i] and mild[i]) else "lower"
+                        for i in rv.index]
+    rv["add_acne_prone (yes/no)"] = ""
+    rv.sort_values("likelihood").to_csv(review_out, index=False)
+
+    total = df.skin_types.fillna("").str.contains("acne-prone").sum()
+    print(f"  of the clear ones: {int((weak & clear & ~(by_name | by_helps | by_strong)).sum())} from "
+          f"an oily-skin name (clarifying, oil-free, mattifying, pore) + pores tag or oil-control ingredient")
+    print(f"acne-prone: tagged {int(clear.sum())} clear + {int(approved.sum())} from your review "
+          f"-> {int(total)} total | {int(review.sum())} left to review in {review_out}")
+    return df
+
+
+# ---------------- Kaggle: Sephora Products and Skincare Reviews (2023) ----------------
+# Download product_info.csv from Kaggle ("Sephora Products and Skincare Reviews", by nadyinky)
+# and put it in data/raw/. Its 'highlights' column holds Sephora's own tags, e.g.
+#   ['Good for: Acne/Blemishes', 'Best for Oily, Combo, Normal Skin', 'Salicylic Acid']
+# so acne products and skin types come from Sephora, not from our guesses.
+HIGHLIGHT_SKIN = {"oily": "oily", "combo": "combination", "combination": "combination",
+                  "normal": "normal", "dry": "dry", "sensitive": "sensitive"}
+
+
+def _as_list(x):
+    import ast
+    if not isinstance(x, str) or not x.strip():
+        return []
+    try:
+        v = ast.literal_eval(x)
+        return [str(i) for i in v] if isinstance(v, (list, tuple)) else [str(v)]
+    except Exception:
+        return [x]
+
+
+def _sephora_ingredients(x):
+    """The column is a list of strings; sets/variants have several lists with headings.
+    Keep the longest real comma-separated list."""
+    parts = [p for p in _as_list(x) if p.count(",") >= 3]
+    if not parts:
+        return ""
+    best = max(parts, key=len)
+    return re.sub(r"\s+", " ", best).strip().lower()
+
+
+def _sephora_skin(highlights):
+    skin = []
+    for h in highlights:
+        hl = h.lower()
+        if hl.startswith("best for") and "skin" in hl:
+            for word, st in HIGHLIGHT_SKIN.items():
+                if re.search(rf"\b{word}\b", hl) and st not in skin:
+                    skin.append(st)
+        if re.search(r"good for:\s*acne|blemish", hl) and "acne-prone" not in skin:
+            skin.append("acne-prone")
+    return skin
+
+
+def load_sephora_2023(path="data/raw/product_info.csv", skincare_only=True):
+    """Convert the Kaggle Sephora 2023 product file to this project's columns."""
+    import pandas as pd
+    k = pd.read_csv(path)
+    if skincare_only and "primary_category" in k:
+        k = k[k["primary_category"].astype(str).str.lower() == "skincare"]
+    if "secondary_category" in k:           # gift sets and minis repeat other products
+        k = k[~k["secondary_category"].astype(str).str.contains(r"gift|value|mini", case=False)]
+    hl = k.get("highlights", pd.Series("", index=k.index)).apply(_as_list)
+    ing = k.get("ingredients", pd.Series("", index=k.index)).apply(_sephora_ingredients)
+    cat = (k.get("tertiary_category", pd.Series(pd.NA, index=k.index))
+           .fillna(k.get("secondary_category", pd.Series("", index=k.index))))
+    out = pd.DataFrame({
+        "brand": k["brand_name"], "name": k["product_name"], "category": cat,
+        "ingredients": ing.replace("", pd.NA),
+        "ingredient_count": ing.apply(lambda t: t.count(",") + 1 if t else 0),
+        "skin_types": hl.apply(lambda h: "|".join(_sephora_skin(h))).replace("", pd.NA),
+        "helps_with": hl.apply(lambda h: "; ".join(x.split(":", 1)[1].strip()
+                                                    for x in h if x.lower().startswith("good for:"))).replace("", pd.NA),
+        "price_usd": k.get("price_usd"), "rating": k.get("rating"), "review_count": k.get("reviews"),
+        "url": "", "currency": "USD", "source": "kaggle (sephora 2023)"})
+    out = out[out.ingredient_count >= 4]          # same rule as the older Kaggle file: real lists only
+    acne = out.skin_types.fillna("").str.contains("acne-prone").sum()
+    print(f"Sephora 2023: {len(out)} skincare products with ingredients | "
+          f"{out.skin_types.notna().sum()} with skin type | {acne} acne-prone")
+    return out
+
+
+# ---------------- diagnostics ----------------
+def check_sites(brands=None):
+    """One request per site: shows whether each site is reachable and what it answers.
+    Use it before a long scrape. Does not save anything."""
+    for b in brands or SITES:
+        cfg = SITES[b]
+        base = cfg["base"].rstrip("/")
+        url = base + ("/products.json?limit=1" if cfg.get("shopify") else "/robots.txt")
+        r = get(url, tries=1)
+        ok = r is not None and r.status_code == 200
+        extra = ""
+        if ok and cfg.get("shopify"):
+            try:
+                extra = f" ({len(r.json().get('products', []))} product returned)"
+            except Exception:
+                extra = " (answered, but not with JSON: probably not a Shopify shop)"
+        print(f"{b:16} {'OK  ' if ok else 'FAIL'} {url}  -> {why(r) if not ok else 'status 200'}{extra}")
+        time.sleep(1)
+
+
 # ---------------- main ----------------
 def scrape_brand(brand, cfg, done):
     print(f"\n=== {brand} ===")
@@ -730,8 +1085,10 @@ def scrape_brand(brand, cfg, done):
     urls = [u for u in urls if not any(s in u.lower() for s in SKIP_URL_PARTS)]
     if rp:
         urls = [u for u in urls if rp.can_fetch(USER_AGENT, u)]
-    urls = [u for u in urls if u not in done]
-    print(f"  candidate URLs (allowed, not yet scraped): {len(urls)}")
+    skip = load_not_products(brand)
+    urls = [u for u in urls if u not in done and u not in skip]
+    print(f"  candidate URLs (allowed, not yet scraped): {len(urls)}"
+          + (f"  ({len(skip)} known non-product pages skipped)" if skip else ""))
     if not urls:
         print("  nothing to do (paste manual_urls if the sitemap gave nothing)")
         return {"brand": brand, "saved": 0, "fetched": 0, "ingredients": 0, "skin": 0}
@@ -746,12 +1103,13 @@ def scrape_brand(brand, cfg, done):
         fetched += 1
         time.sleep(DELAY_SECONDS)
         if r is None or r.status_code != 200:
-            print(f"    skip ({r.status_code if r else 'error'}): {u}")
+            print(f"    skip ({r.status_code if r is not None else 'no connection'}): {u}")
             continue
 
         row = parse_product(r.text, u, brand, cfg.get("currency", "USD"))
         if row is None:
             print(f"    not a product page: {u}")
+            remember_not_product(brand, u)
             # keep a few rejected pages so we can check whether real products are being missed
             if rejected_saved < 6:
                 os.makedirs("debug_html", exist_ok=True)
