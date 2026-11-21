@@ -1,0 +1,16 @@
+{
+  "products": 2724,
+  "sourced_product_records": 2709,
+  "unique_photo_matches": 2682,
+  "sources": [
+    "Original brand product pages",
+    "Retailer product pages",
+    "Ingredient catalogs"
+  ],
+  "editorial_assets": [
+    "assets/glowguide-rose-editorial.jpg",
+    "assets/glowguide-textures-editorial.jpg"
+  ],
+  "missing_photo_report": "products_missing_photos.csv",
+  "unverified_photo_records": 15
+}

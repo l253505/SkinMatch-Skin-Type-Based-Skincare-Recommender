@@ -1,0 +1,13 @@
+{
+  "mode": "Built-in image_gen tool",
+  "assets": [
+    {
+      "path": "assets/glowguide-rose-editorial.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset type: wide editorial hero photograph for GlowGuide, a feminine professional skincare web app. Primary request: aesthetic luxurious skincare still life in dusty rose, blush pink and warm white. Scene: a small sculptural pink ceramic tray holding an unbranded frosted glass serum dropper and a blank white moisturizer jar, translucent pink water glass, soft pink rose petals and a folded white cotton towel, delicate shadows from morning sunlight. Composition: wide landscape, objects grouped in right half, left half softly lit blush wall with clean negative space for website heading. Photography: realistic glass reflections, tactile ceramic and cotton, editorial beauty magazine art direction, tasteful, airy and sophisticated. No words, no logos, no recognizable branded packaging, no people, no watermark. Generate a wide image."
+    },
+    {
+      "path": "assets/glowguide-textures-editorial.jpg",
+      "prompt": "Use case: photorealistic-natural. Asset type: editorial skincare journal image for GlowGuide. Create a sophisticated beauty still life photographed directly overhead: pearlescent white moisturizer swatch and a transparent serum droplet on rose-pink textured glass, a single pale blush rose with curved petals partially entering frame, gentle water ripples and natural sunlight shadows. Aesthetic feminine beauty magazine photography, refined and tactile, dusty pink and ivory with a small burgundy accent. Photoreal, elegant simplicity, no packaging labels, no text, no logos, no watermark. Landscape composition."
+    }
+  ]
+}

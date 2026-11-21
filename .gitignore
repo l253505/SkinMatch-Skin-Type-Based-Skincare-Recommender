@@ -1,0 +1,22 @@
+# Local Python and notebook files
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+.streamlit/secrets.toml
+
+# Local review and collection caches
+review/
+photo_search_parts/
+photo_*.json
+!photo_coverage.json
+!photo_rejected_image_hashes.json
+product_page_searches.json
+skinwis_product_urls.json
+blissful_water_cream_photo.json
+existing_photo_failures.json
+replaced_*.json
+project_data_manifest.json
+app_simple_layout.py

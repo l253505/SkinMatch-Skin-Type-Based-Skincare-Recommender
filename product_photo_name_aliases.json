@@ -1,0 +1,746 @@
+[
+  {
+    "brand": "Alpha-H",
+    "name": "Liquid Gold Midnight Reboot Serum with 14% Glycolic Acid and Tripeptide-5",
+    "photo_name": "Liquid Gold Midnight Reboot Serum"
+  },
+  {
+    "brand": "Alpha-H",
+    "name": "Beauty Sleep Power Peel Age-Defying Night Peel",
+    "photo_name": "Beauty Sleep Power Peel"
+  },
+  {
+    "brand": "alpyn beauty",
+    "name": "Creamy Bubbling Cleanser with Vitamin C & AHAs",
+    "photo_name": "Creamy Bubbling Cleanser"
+  },
+  {
+    "brand": "Augustinus Bader",
+    "name": "The Cream Cleansing Gel with TFC8 Gentle Cleanser",
+    "photo_name": "The Cream Cleansing Gel"
+  },
+  {
+    "brand": "BeautyBio",
+    "name": "Glass & Gloss 2-Step Facial Retexturizing & Brightening Treatment",
+    "photo_name": "Glass & Gloss"
+  },
+  {
+    "brand": "BeautyBio",
+    "name": "The Quench Quadralipid Rapid Recovery Facial Moisturizer",
+    "photo_name": "The Quench Quadralipid Recovery"
+  },
+  {
+    "brand": "Shiseido",
+    "name": "Benefiance WrinkleResist24 Day Cream Broad Spectrum SPF 18",
+    "photo_name": "Benefiance WrinkleResist24 Day Cream SPF 18"
+  },
+  {
+    "brand": "Herbivore",
+    "name": "Phoenix Cell Regenerating Facial Oil",
+    "photo_name": "Phoenix Face Oil"
+  },
+  {
+    "brand": "Lancôme",
+    "name": "BIENFAIT MULTI-VITAL NIGHT - High Potency Night Moisturizing Cream VITA-NUTRI 8™",
+    "photo_name": "Bienfait Multi-Vital Night Cream"
+  },
+  {
+    "brand": "Kiehl's",
+    "name": "Ultra Facial Overnight Hydrating Mask",
+    "photo_name": "Ultra Facial Overnight Hydrating Masque"
+  },
+  {
+    "brand": "Caudalie",
+    "name": "Premier Cru Dark Circle Correcting Eye Cream",
+    "photo_name": "Premier Cru Eye Cream"
+  },
+  {
+    "brand": "Charlotte Tilbury",
+    "name": "Mini Magic Night 15ml Travel Size",
+    "photo_name": "Magic Night Cream 15ml"
+  },
+  {
+    "brand": "Clarins",
+    "name": "Santal Soothing & Hydrating Natural Face Treatment Oil",
+    "photo_name": "Santal Treatment Oil"
+  },
+  {
+    "brand": "Clarins",
+    "name": "V Shaping Facial Lift Depuff & Contour Serum with Hyaluronic Acid",
+    "photo_name": "V Shaping Facial Lift Serum"
+  },
+  {
+    "brand": "Clinique",
+    "name": "Smart Broad Spectrum SPF 15 Custom-Repair Moisturizer for Dry Combination Skin",
+    "photo_name": "Smart SPF 15 Custom-Repair Moisturizer"
+  },
+  {
+    "brand": "Clinique",
+    "name": "Repairwear Laser Focus Line Smoothing Cream Broad Spectrum SPF 15 for Very Dry to Dry Combination Skin",
+    "photo_name": "Repairwear Laser Focus SPF 15 Line Smoothing Cream"
+  },
+  {
+    "brand": "Dermalogica",
+    "name": "Acne Clearing Skin Wash Cleanser",
+    "photo_name": "Clearing Skin Wash"
+  },
+  {
+    "brand": "Dermalogica",
+    "name": "Daily Superfoliant Exfoliator",
+    "photo_name": "Daily Superfoliant"
+  },
+  {
+    "brand": "Dior",
+    "name": "Cica Recover & Repair Multi-Use Balm",
+    "photo_name": "Cica Recover Balm"
+  },
+  {
+    "brand": "Dr. Dennis Gross Skincare",
+    "name": "Hyaluronic Marine Makeup Removing Meltaway Cleanser",
+    "photo_name": "Hyaluronic Marine Meltaway Cleanser"
+  },
+  {
+    "brand": "Dr. Lara Devgan Scientific Beauty",
+    "name": "Advanced Revitalizing Cleanser",
+    "photo_name": "Advanced Revitalizing Cleanser"
+  },
+  {
+    "brand": "FaceGym",
+    "name": "Face Coach Lifting Squalane Face Oil",
+    "photo_name": "Face Coach Face Oil"
+  },
+  {
+    "brand": "Fenty Skin",
+    "name": "Hydra Vizor Invisible Moisturizer Broad Spectrum SPF 30 Sunscreen with Niacinamide + Kalahari Melon",
+    "photo_name": "Hydra Vizor Invisible Moisturizer SPF 30"
+  },
+  {
+    "brand": "Fenty Skin",
+    "name": "Total Cleans'r Makeup-Removing Cleanser with Barbados Cherry",
+    "photo_name": "Total Cleansr"
+  },
+  {
+    "brand": "fresh",
+    "name": "Tea Elixir Niacinamide & Hyaluronic Acid Anti-Aging Serum",
+    "photo_name": "Tea Elixir Serum"
+  },
+  {
+    "brand": "fresh",
+    "name": "Lotus Anti- Aging Daily Moisturizer",
+    "photo_name": "Lotus Youth Preserve"
+  },
+  {
+    "brand": "Glow Recipe",
+    "name": "Avocado Fine Line Eye Cream with Retinol",
+    "photo_name": "Avocado Melt Retinol Eye Cream"
+  },
+  {
+    "brand": "Glow Recipe",
+    "name": "Plum Plump Hyaluronic Acid Moisturizer",
+    "photo_name": "Plum Plump Hyaluronic Cream"
+  },
+  {
+    "brand": "Herbivore",
+    "name": "Orchid Antioxidant Beauty Face Oil - For Combination Skin",
+    "photo_name": "Orchid Face Oil"
+  },
+  {
+    "brand": "Ilia",
+    "name": "C Beyond Triple Serum SPF 40 Mineral Sunscreen with Vitamin C 10% + Niacinamide",
+    "photo_name": "C Beyond Triple Serum SPF 40"
+  },
+  {
+    "brand": "INC.redible",
+    "name": "Party Recharge Cryo Me Crazy Under-eye Masks",
+    "photo_name": "Party Recharge Cryo Under Eye Masks"
+  },
+  {
+    "brand": "iNNBEAUTY PROJECT",
+    "name": "Down to Tone Resurfacing Acid Toner",
+    "photo_name": "Down to Tone Toner"
+  },
+  {
+    "brand": "iNNBEAUTY PROJECT",
+    "name": "GREEN MACHINE insta-glo resurfacing acid mask",
+    "photo_name": "Green Machine Mask"
+  },
+  {
+    "brand": "innisfree",
+    "name": "Green Tea Hyaluronic Acid Hydrating Moisturizer",
+    "photo_name": "Green Tea Seed Hyaluronic Cream"
+  },
+  {
+    "brand": "Josie Maran",
+    "name": "Argan Daily Moisturizer Tinted SPF 47 Protect + Perfect",
+    "photo_name": "Argan Daily SPF 47 Protect Perfect"
+  },
+  {
+    "brand": "Kate McLeod",
+    "name": "Face Stone Nourishing Solid Refillable Facial Oil with Tamanu + Blue Tansy",
+    "photo_name": "Face Stone"
+  },
+  {
+    "brand": "Kate Somerville",
+    "name": "DermalQuench Hyaluronic Acid Hydration Treatment",
+    "photo_name": "DermalQuench Liquid Lift"
+  },
+  {
+    "brand": "KORA Organics",
+    "name": "Noni Glow Plumping Face Oil",
+    "photo_name": "Noni Glow Face Oil"
+  },
+  {
+    "brand": "KORA Organics",
+    "name": "Noni Glow Overnight Plumping Hydration Mask",
+    "photo_name": "Noni Glow Sleeping Mask"
+  },
+  {
+    "brand": "La Mer",
+    "name": "The Eye Concentrate Cream",
+    "photo_name": "Eye Concentrate"
+  },
+  {
+    "brand": "Lancôme",
+    "name": "Advanced Génifique Radiance Boosting Face Serum",
+    "photo_name": "Advanced Genifique"
+  },
+  {
+    "brand": "Lancôme",
+    "name": "Hydra Zen Glow Liquid Lightweight Moisturizer with Hyaluronic Acid",
+    "photo_name": "Hydra Zen Liquid Glow Moisturizer"
+  },
+  {
+    "brand": "MACRENE actives",
+    "name": "Moisturizing High Performance Face Cream with Peptides",
+    "photo_name": "High Performance Face Cream"
+  },
+  {
+    "brand": "MACRENE actives",
+    "name": "High Performance Face Cleanser for Clear Skin with Niacinamide",
+    "photo_name": "High Performance Cleanser"
+  },
+  {
+    "brand": "Make Up For Ever",
+    "name": "Gentle Eye Gel Waterproof Eye & Lip Makeup Remover",
+    "photo_name": "Gentle Eye Gel"
+  },
+  {
+    "brand": "Mara",
+    "name": "Spirulina + Ashwagandha Volcanic Sea Clay Detox Masque",
+    "photo_name": "Volcanic Sea Clay Detox Masque"
+  },
+  {
+    "brand": "Mount Lai",
+    "name": "Calming Herbal Repair Overnight Recovery Balm for Skin Barrier Support",
+    "photo_name": "Calming Herbal Repair Serum Concentrate Balm"
+  },
+  {
+    "brand": "Olehenriksen",
+    "name": "Truth Serum Vitamin C Serum",
+    "photo_name": "Truth Serum"
+  },
+  {
+    "brand": "Peter Thomas Roth",
+    "name": "Vital-E Antioxidant Recovery Cream",
+    "photo_name": "Vital-E Antioxidant Recovery Cream"
+  },
+  {
+    "brand": "Peter Thomas Roth",
+    "name": "Potent-C Power Brightening Hydra-Gels",
+    "photo_name": "Potent-C Hydra Gel Eye Patches"
+  },
+  {
+    "brand": "Saint Jane Beauty",
+    "name": "Bright Repair Eye Cream – 10% Vitamin C",
+    "photo_name": "Bright Repair Eye Cream"
+  },
+  {
+    "brand": "Saint Jane Beauty",
+    "name": "Hydrating Petal Cream – 1% Pure Hyaluronic Acid Moisturizer",
+    "photo_name": "Hydrating Petal Cream"
+  },
+  {
+    "brand": "Sephora Collection",
+    "name": "SUPERMASK - The Charcoal Mask",
+    "photo_name": "Charcoal Mask"
+  },
+  {
+    "brand": "Sephora Collection",
+    "name": "Gradual Self-Tanning Face Gel",
+    "photo_name": "Gradual Self Tanning Face Gel"
+  },
+  {
+    "brand": "Sephora Collection",
+    "name": "Pores Target Serum",
+    "photo_name": "Targeted Pores Serum"
+  },
+  {
+    "brand": "Sephora Collection",
+    "name": "Clean Hemp Mask",
+    "photo_name": "Hemp Mousse Mask"
+  },
+  {
+    "brand": "Sephora Collection",
+    "name": "Mini Cleansing Wipes - Coconut Water",
+    "photo_name": "Coconut Water Cleansing Wipes Mini"
+  },
+  {
+    "brand": "Shani Darden Skin Care",
+    "name": "Retinol Reform Treatment Serum",
+    "photo_name": "Retinol Reform"
+  },
+  {
+    "brand": "Shani Darden Skin Care",
+    "name": "Lactic Acid AHA Exfoliating Serum",
+    "photo_name": "Lactic Acid Exfoliating Serum"
+  },
+  {
+    "brand": "Shiseido",
+    "name": "Urban Environment Oil-Free Sunscreen Broad-Spectrum SPF 42",
+    "photo_name": "Urban Environment Oil Free UV Protector SPF 42"
+  },
+  {
+    "brand": "Shiseido",
+    "name": "Future Solution LX Total Protective Cream Broad Spectrum SPF 20 Sunscreen",
+    "photo_name": "Future Solution LX Total Protective Cream SPF 20"
+  },
+  {
+    "brand": "SOBEL SKIN Rx",
+    "name": "4.5% Retinol Serum",
+    "photo_name": "4.5% Retinol Complex Night Treatment"
+  },
+  {
+    "brand": "Sulwhasoo",
+    "name": "Gentle Cleansing Foam Hydrating Makeup Remover",
+    "photo_name": "Gentle Cleansing Foam"
+  },
+  {
+    "brand": "Sunday Riley",
+    "name": "Auto Correct Brightening + Depuffing Eye Cream for Dark Circles",
+    "photo_name": "Auto Correct Eye Contour Cream"
+  },
+  {
+    "brand": "Supergoop!",
+    "name": "(Re)setting 100% Mineral Powder Sunscreen SPF 35 PA+++",
+    "photo_name": "Resetting 100% Mineral Powder SPF 35"
+  },
+  {
+    "brand": "Tata Harper",
+    "name": "Clarifying Blemish & Oil Control Cleanser",
+    "photo_name": "Clarifying Cleanser"
+  },
+  {
+    "brand": "Tata Harper",
+    "name": "Restorative Plumping + Brightening Eye Cream",
+    "photo_name": "Restorative Eye Creme"
+  },
+  {
+    "brand": "Tata Harper",
+    "name": "Purifying Pore Detox Cleanser",
+    "photo_name": "Purifying Cleanser"
+  },
+  {
+    "brand": "Tata Harper",
+    "name": "Superkind Fragrance-Free Softening Cleanser",
+    "photo_name": "Superkind Softening Cleanser"
+  },
+  {
+    "brand": "Tata Harper",
+    "name": "Superkind Fragrance-Free Bio-Barrier Serum",
+    "photo_name": "Superkind Bio Barrier Serum"
+  },
+  {
+    "brand": "Tata Harper",
+    "name": "Crème Riche Anti-Aging Peptide Night Cream",
+    "photo_name": "Creme Riche Peptide Cream"
+  },
+  {
+    "brand": "Tatcha",
+    "name": "The Camellia Oil 2-in-1 Makeup Remover & Cleanser",
+    "photo_name": "Camellia Cleansing Oil"
+  },
+  {
+    "brand": "Tatcha",
+    "name": "Indigo Overnight Repair Serum in Cream Treatment",
+    "photo_name": "Indigo Overnight Repair"
+  },
+  {
+    "brand": "The INKEY List",
+    "name": "Salicylic Acid Acne + Pore Cleanser",
+    "photo_name": "Salicylic Acid Cleanser"
+  },
+  {
+    "brand": "The INKEY List",
+    "name": "Tranexamic Acid Hyperpigmentation Treatment",
+    "photo_name": "Tranexamic Acid Night Treatment"
+  },
+  {
+    "brand": "The INKEY List",
+    "name": "Polyhydroxy Acid (PHA) Gentle Exfoliating Toner",
+    "photo_name": "PHA Toner"
+  },
+  {
+    "brand": "The INKEY List",
+    "name": "Beta Hydroxy Acid (BHA) Blemish + Blackhead Serum",
+    "photo_name": "Beta Hydroxy Acid Serum"
+  },
+  {
+    "brand": "The INKEY List",
+    "name": "SuperSolutions 10% Azelaic Serum Redness Relief Solution",
+    "photo_name": "Supersolutions 10% Azelaic Acid Serum"
+  },
+  {
+    "brand": "The Ordinary",
+    "name": "Salicylic Acid 2% Anhydrous Solution Pore Clearing Serum",
+    "photo_name": "Salicylic Acid 2% Anhydrous Solution"
+  },
+  {
+    "brand": "The Ordinary",
+    "name": "Salicylic Acid 2% Exfoliating Blemish Solution",
+    "photo_name": "Salicylic Acid 2% Solution"
+  },
+  {
+    "brand": "The Outset",
+    "name": "Exfoliating Revitalizing & Energizing Caffeine Micro Polish",
+    "photo_name": "Exfoliating Caffeine Micro Polish"
+  },
+  {
+    "brand": "Youth To The People",
+    "name": "Kombucha + 10% AHA Liquid Exfoliant with Lactic Acid and Glycolic Acid",
+    "photo_name": "Kombucha 10% AHA Power Exfoliant"
+  },
+  {
+    "brand": "bareMinerals",
+    "name": "COMPLEXION RESCUE™ Tinted Moisturizer Broad Spectrum SPF 30",
+    "photo_name": "Complexion Rescue Tinted Moisturizer SPF 30"
+  },
+  {
+    "brand": "Shiseido",
+    "name": "Ibuki Protective Moisturizer Broad Spectrum SPF 18",
+    "photo_name": "Ibuki Protective Moisturizer SPF 18"
+  },
+  {
+    "brand": "Shiseido",
+    "name": "White Lucent All Day Brightener Broad Spectrum SPF 23 Moisturizer",
+    "photo_name": "White Lucent All Day Brightener SPF 23"
+  },
+  {
+    "brand": "IT Cosmetics",
+    "name": "Confidence in a Cleanser™ Skin-Transforming Hydrating Cleansing Serum",
+    "photo_name": "Confidence in a Cleanser"
+  },
+  {
+    "brand": "fresh",
+    "name": "Rose Floral Toner Mini",
+    "photo_name": "Rose Floral Toner"
+  },
+  {
+    "brand": "Kate Somerville",
+    "name": "Kate's Mini Must Haves",
+    "photo_name": "Mini Must Haves"
+  },
+  {
+    "brand": "Glamglow",
+    "name": "SUPERMUD® Activated Charcoal Treatment",
+    "photo_name": "Supermud Charcoal Clearing Treatment"
+  },
+  {
+    "brand": "Caudalie",
+    "name": "Vine[Activ] Vitamin C Anti-Wrinkle Serum",
+    "photo_name": "Vine Activ Glow Activating Anti Wrinkle Serum"
+  },
+  {
+    "brand": "Murad",
+    "name": "Acne Clearing Solution",
+    "photo_name": "Blemish Clearing Solution"
+  },
+  {
+    "brand": "Omorovicza",
+    "name": "Silver Skin Savior Salicylic/Glycolic Acid Treatment",
+    "photo_name": "Silver Skin Saviour"
+  },
+  {
+    "brand": "Origins",
+    "name": "Drink Up™ Intensive Overnight Mask to Quench Skin's Thirst",
+    "photo_name": "Drink Up Intensive Overnight Mask"
+  },
+  {
+    "brand": "fresh",
+    "name": "Vitamin C Glow Face Mask",
+    "photo_name": "Vitamin Nectar Face Mask"
+  },
+  {
+    "brand": "Sephora Collection",
+    "name": "Face Mask - Green Tea - Mattifying",
+    "photo_name": "Green Tea Face Mask"
+  },
+  {
+    "brand": "Sephora Collection",
+    "name": "SUPERMASK - The Golden Mask",
+    "photo_name": "Golden Mask"
+  },
+  {
+    "brand": "Sephora Collection",
+    "name": "Face Mask - Pineapple - Pore Perfecting",
+    "photo_name": "Pineapple Face Mask"
+  },
+  {
+    "brand": "Youth To The People",
+    "name": "Superfood Skin Reset Antioxidant Mask",
+    "photo_name": "Superfood Skin Reset Mask"
+  },
+  {
+    "brand": "Sephora Collection",
+    "name": "SUPERMASK - The Mud Mask",
+    "photo_name": "Mud Mask"
+  },
+  {
+    "brand": "Glamglow",
+    "name": "BUBBLESHEET™ Oxygenating Deep Cleanse Mask - Breast Cancer Awareness Edition",
+    "photo_name": "Bubblesheet Oxygenating Deep Cleanse Mask"
+  },
+  {
+    "brand": "Dr. Brandt Skincare",
+    "name": "MAGNETIGHT™ Age-Defier Mask Bundle",
+    "photo_name": "Magnetight Age Defier Mask"
+  },
+  {
+    "brand": "Skin Inc Supplement Bar",
+    "name": "Get Glowin’ Brightening Mask",
+    "photo_name": "Get Glowin Mask"
+  },
+  {
+    "brand": "Bobbi Brown",
+    "name": "Instant Detox Hawaiian Sea Water & White Clay Face Mask",
+    "photo_name": "Instant Detox Mask"
+  },
+  {
+    "brand": "Bobbi Brown",
+    "name": "Radiance Boost Walnut Grain & Orange Oil Exfoliating Face Mask",
+    "photo_name": "Radiance Boost Exfoliating Mask"
+  },
+  {
+    "brand": "St. Tropez Tanning Essentials",
+    "name": "Self Tan Express Bronzing Face Sheet Mask",
+    "photo_name": "Self Tan Express Bronzing Face Sheet Mask"
+  },
+  {
+    "brand": "IT Cosmetics",
+    "name": "Bye Bye Under Eye Eye Cream™ Smooths, Brightens, Depuffs",
+    "photo_name": "Bye Bye Under Eye Eye Cream"
+  },
+  {
+    "brand": "Caudalie",
+    "name": "Vine[activ] Energizing Vitamin C Eye Cream",
+    "photo_name": "Vine Activ Energizing Eye Cream"
+  },
+  {
+    "brand": "Kate Somerville",
+    "name": "#NAME?",
+    "photo_name": "Retinol Firming Eye Cream",
+    "display_name": "Retinol Firming Eye Cream",
+    "identity_evidence": "Exact ingredient-set match to product_info.csv product P411881"
+  },
+  {
+    "brand": "Supergoop!",
+    "name": "Advanced Anti-Aging Eye Cream Broad Spectrum Sunscreen SPF 37",
+    "photo_name": "Advanced Anti Aging Eye Cream SPF 37"
+  },
+  {
+    "brand": "Skin Inc Supplement Bar",
+    "name": "Vitamin A Serum EVEN TONE & REDUCE DARK CIRCLES",
+    "photo_name": "Vitamin A Serum"
+  },
+  {
+    "brand": "Klorane",
+    "name": "Smoothing and Relaxing Patches with Soothing Cornflower",
+    "photo_name": "Cornflower Eye Patches"
+  },
+  {
+    "brand": "Neogen Dermalogy",
+    "name": "Day-Light Protection Sun Screen SPF 50 PA+++",
+    "photo_name": "Day Light Protection Sunscreen SPF 50"
+  },
+  {
+    "brand": "Farmacy",
+    "name": "Green Screen Daily Environmental Protector Broad Spectrum MineralSunscreen SPF 30 with Echinacea GreenEnvy™",
+    "photo_name": "Green Screen SPF 30"
+  },
+  {
+    "brand": "Shiseido",
+    "name": "Ultimate Sun Protection Cream Broad Spectrum SPF 50+ Wetforce For Face",
+    "photo_name": "Ultimate Sun Protection Cream Wetforce SPF 50"
+  },
+  {
+    "brand": "Perricone Md",
+    "name": "High Potency Classics: Face Finishing & Firming Moisturizer Tint SPF 30",
+    "photo_name": "High Potency Classics Tinted Moisturizer"
+  },
+  {
+    "brand": "Amorepacific",
+    "name": "FUTURE RESPONSE Age Defense Creme SPF 30",
+    "photo_name": "Future Response Age Defense Creme SPF 30"
+  },
+  {
+    "brand": "Estée Lauder",
+    "name": "Advanced Time Zone SPF 15- Normal/Combination Skin",
+    "photo_name": "Advanced Time Zone SPF 15"
+  },
+  {
+    "brand": "Dior",
+    "name": "Hydra Life BB Creme Broad Spectrum SPF 30",
+    "photo_name": "Hydra Life BB Creme"
+  },
+  {
+    "brand": "Kiehl's",
+    "name": "Powerful Wrinkle Reducing Cream Sunscreen Broad Spectrum SPF 30",
+    "photo_name": "Powerful Wrinkle Reducing Cream SPF 30"
+  },
+  {
+    "brand": "Erborian",
+    "name": "CC Red Correct Automatic Perfector Broad Spectrum SPF 25",
+    "photo_name": "CC Red Correct SPF 25"
+  },
+  {
+    "brand": "Lancer",
+    "name": "Sheer Fluid Sun Shield Broad Spectrum SPF 30 Sunscreen",
+    "photo_name": "Sheer Fluid Sun Shield SPF 30"
+  },
+  {
+    "brand": "Coola",
+    "name": "Classic Face SPF 30 - Unscented",
+    "photo_name": "Classic Face SPF 30 Unscented"
+  },
+  {
+    "brand": "Mdsolarsciences",
+    "name": "Mineral Crème Broad Spectrum SPF 50 UVA-UVB Sunscreen",
+    "photo_name": "Mineral Creme SPF 50"
+  },
+  {
+    "brand": "Estée Lauder",
+    "name": "DayWear Multi-Protection Anti-Oxidant Sheer Tint Release Moisturizer Broad Spectrum SPF 15 - Normal/ Combination Skin",
+    "photo_name": "Daywear Sheer Tint Moisturizer SPF 15"
+  },
+  {
+    "brand": "Lancôme",
+    "name": "Rènergie Lift Multi-Action Sunscreen Broad Spectrum SPF 15 For Dry Skin",
+    "photo_name": "Renergie Lift Multi Action SPF 15 Rich Cream"
+  },
+  {
+    "brand": "Skin Laundry",
+    "name": "Daily Moisturizer Broad Spectrum SPF 35",
+    "photo_name": "Advanced Protection Daily Moisturizer"
+  },
+  {
+    "brand": "Clinique",
+    "name": "Smart Broad Spectrum SPF 15 Custom-Repair Moisturizer for Combination Oily Skin",
+    "photo_name": "Smart SPF 15 Custom Repair Moisturizer"
+  },
+  {
+    "brand": "Mdsolarsciences",
+    "name": "Mineral Moisture Defense Body Broad Spectrum SPF 50 UVA-UVB Sunscreen",
+    "photo_name": "Mineral Moisture Defense SPF 50"
+  },
+  {
+    "brand": "Mdsolarsciences",
+    "name": "MD Crème Mineral Beauty Balm Broad Spectrum SPF 50 UVA-UVB Sunscreen",
+    "photo_name": "MD Creme Mineral Beauty Balm SPF 50"
+  },
+  {
+    "brand": "Cane + Austin",
+    "name": "Protect Ultra Sheer Weightless Sunscreen Broad Spectrum SPF 50+ UVA/UVB",
+    "photo_name": "Ultra Sheer Weightless Sunscreen SPF 50"
+  },
+  {
+    "brand": "Moroccanoil",
+    "name": "After-Sun Milk Soothing Body Lotion",
+    "photo_name": "Sun After Sun Milk"
+  },
+  {
+    "brand": "Supergoop!",
+    "name": "Perfect Day 2-in-1 Everywear Lotion Broad Spectrum SPF 50 + Mint Condition Lip Shield SPF 30",
+    "photo_name": "Perfect Day 2 in 1"
+  },
+  {
+    "brand": "Korres",
+    "name": "Yoghurt Nourishing Fluid Veil Face Sunscreen Broad Spectrum SPF 30",
+    "photo_name": "Yoghurt Nourishing Fluid Veil SPF 30"
+  },
+  {
+    "brand": "Clarins",
+    "name": "Total Eye Lift Firming & Smoothing Anti-Aging Eye Cream",
+    "photo_name": "Total Eye Lift"
+  },
+  {
+    "brand": "Drunk Elephant",
+    "name": "Protini Polypeptide Firming Refillable Moisturizer",
+    "photo_name": "Protini Polypeptide Cream"
+  },
+  {
+    "brand": "Mara",
+    "name": "Mini Evening Primrose + Green Tea Algae Retinol Face Oil",
+    "photo_name": "Algae Retinol Face Oil"
+  },
+  {
+    "brand": "REN Clean Skincare",
+    "name": "Evercalm Barrier Support Antioxidant Moisturizer",
+    "photo_name": "Evercalm Global Protection Day Cream"
+  },
+  {
+    "brand": "Shiseido",
+    "name": "Urban Environment Oil-Free Mineral Sunscreen Broad-Spectrum SPF 42",
+    "photo_name": "Urban Environment Mineral Sunscreen SPF 42"
+  },
+  {
+    "brand": "The Ordinary",
+    "name": "Mini Squalane Cleanser",
+    "photo_name": "Squalane Cleanser 50ml"
+  },
+  {
+    "brand": "The Ordinary",
+    "name": "Mini Natural Moisturizing Factors + HA",
+    "photo_name": "Natural Moisturizing Factors HA 30ml"
+  },
+  {
+    "brand": "fresh",
+    "name": "Vitamin C Glow Moisturizer",
+    "photo_name": "Vitamin Nectar Moisture Glow Cream"
+  },
+  {
+    "brand": "INC.redible",
+    "name": "Hydrating Boob and Bum Sheet Mask Duo",
+    "photo_name": "Juicy Pair Boob Bum Mask Duo",
+    "identity_evidence": "Nails Inc official packaging title; peach extract in project ingredient list"
+  },
+  {
+    "brand": "Prima",
+    "name": "Night Magic Restorative Face Oil with Firming Botanicals",
+    "photo_name": "Night Magic Oil"
+  },
+  {
+    "brand": "HUM Nutrition",
+    "name": "OMG!™ Omega The Great Supplements",
+    "photo_name": "Omega The Great"
+  },
+  {
+    "brand": "Amorepacific",
+    "name": "FUTURE RESPONSE Age Defense Creme SPF 30",
+    "photo_name": "Future Response Age Defense Cream"
+  },
+  {
+    "brand": "Lancôme",
+    "name": "Rènergie Lift Multi-Action Sunscreen Broad Spectrum SPF 15 For Dry Skin",
+    "photo_name": "Renergie Lift Multi Action Rich Cream"
+  },
+  {
+    "brand": "Clinique",
+    "name": "Acne Solutions BB Cream Broad Spectrum SPF 40",
+    "photo_name": "Acne Solutions BB Cream SPF 40"
+  },
+  {
+    "brand": "Lancôme",
+    "name": "Cleansing & Clarifying Duo",
+    "photo_name": "Bi Facil Creme Radiance Duo",
+    "identity_evidence": "cosmetics.csv explicitly lists Bi-Facil and Crème Radiance as the set formulas"
+  }
+]
