@@ -28,4 +28,4 @@ python -m pip install -r requirements-notebooks.txt
 python -m unittest test_recommendation_engine.py
 ```
 
-Product photos are included locally. Fifteen records lack an exact verified photograph and show a neutral placeholder. Evaluation scores describe the notebook validation split, not individual product suitability. K-means grouping is explanatory context, not a quality rating.
+Product photos are included locally. Fifteen records lack an exact verified photograph and show a neutral placeholder. Skin types for unlabelled products come from the Logistic Regression model (selected over KNN); recommendations rank by ingredient cosine similarity with small bonuses for shared key ingredients and the same K-means group. Evaluation scores describe the notebook test split, not individual product suitability. K-means grouping is explanatory context, not a quality rating.
