@@ -23,15 +23,15 @@ python -m streamlit run app.py
 
 Eligible products must match the selected skin type, budget, and filters. Phase 4 excludes the reference itself, counts shared flags among six tracked key ingredients, computes TF-IDF cosine similarity, removes zero-overlap candidates, and sorts by shared-flag count first and cosine similarity second. Displayed percentages are calculated from the matrix.
 
-The app uses original labels for 1,557 records and saved KNN-inferred labels for 1,167 records. Nine exported K-means groups describe 11 binary ingredient features. Group membership is explanatory context and does not change Phase 4 ranking. KNN and K-means training remains in the notebooks; the app uses their saved outputs.
+The app uses original labels for 1,552 records and saved KNN-inferred labels for 1,162 records. Nine exported K-means groups describe 11 binary ingredient features. Group membership is explanatory context and does not change Phase 4 ranking. KNN and K-means training remains in the notebooks; the app uses their saved outputs.
 
 Ingredient presence does not establish concentration. Cosine similarity is not a probability of safety, efficacy, or skin suitability. PKR prices are dataset estimates rather than live retail quotes.
 
 ## Product photographs
 
-The registry contains 2,682 unique sourced photo matches covering 2,709 of 2,724 product records. Images are bundled under `assets/products/`; each photographed card links to its source. Sources include original brands, retailers, and ingredient catalogs. Matching checks meaningful variants, strengths, SPF, and product form; reviewed identity aliases are recorded in `product_photo_name_aliases.json`.
+The registry contains 2,697 unique sourced photo matches covering 2,724 of 2,724 product records. Images are bundled under `assets/products/`; each photographed card links to its source. Sources include original brands, retailers, and ingredient catalogs. Matching checks meaningful variants, strengths, SPF, and product form; reviewed identity aliases are recorded in `product_photo_name_aliases.json`.
 
-Fifteen older products or sets still lack an exact verified photograph. They receive a neutral Photo not verified tile, never another product's photograph or a generic skincare image. `products_missing_photos.csv` lists them; `photo_coverage.json` summarizes coverage. Packaging editions or sizes can differ from dataset records, so source links remain visible.
+All 2,724 records now have product imagery. For 2,723 records, the product or documented contents are verified. The Algenist Dark Circle Corrector Set uses a gallery of the three products listed in the brand’s archived Dark Circle Correcting Kit. Its exact dataset edition is unconfirmed, visibly labelled, and excluded from Verified photos only. See products_needing_photo_verification.csv. Product sizes and packaging editions can differ.
 
 `resolve_product_photo_search.py` validates saved source candidates and decodes downloaded files before adding them. Known placeholder hashes are rejected. Candidate evidence, reviewed aliases, and replacement audits remain for traceability.
 

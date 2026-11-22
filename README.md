@@ -28,4 +28,4 @@ python -m pip install -r requirements-notebooks.txt
 python -m unittest test_recommendation_engine.py
 ```
 
-Product photos are included locally. Fifteen records lack an exact verified photograph and show a neutral placeholder. Evaluation scores describe the notebook validation split, not individual product suitability. K-means grouping is explanatory context, not a quality rating.
+Product photos are included locally. Every record now has real product imagery. The Algenist Dark Circle Corrector Set uses a clearly labelled reference gallery of the documented archived brand-kit contents; its exact dataset edition is unconfirmed and excluded from the verified-photo filter. Evaluation scores describe the notebook validation split, not individual product suitability. K-means grouping is explanatory context, not a quality rating.

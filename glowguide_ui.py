@@ -29,10 +29,13 @@ def get_catalog(photo_version,data_version):
     photos=json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
     photos={photo_key(p['brand'],p['name']):p for p in photos.values()}
     records=[photos.get(photo_key(r.brand,r['name']),{}) for _,r in df.iterrows()]
-    for column,field in [('image_url','image_url'),('local_image','local_image'),('photo_source','source_url')]:
+    for column,field in [('image_url','image_url'),('local_image','local_image'),('photo_source','source_url'),('photo_note','photo_note')]:
         df[column]=[r.get(field,'') for r in records]
     df['name']=[r.get('display_name',name) for r,name in zip(records,df['name'])]
     df['has_photo']=[bool(r.get('local_image') and (ROOT/'assets'/r['local_image']).is_file()) for r in records]
+    df['photo_verified']=[bool(r.get('photo_verified',True) and present) for r,present in zip(records,df['has_photo'])]
+    df['photo_gallery']=[r.get('photo_gallery',[]) for r in records]
+    df['photo_documentation']=[r.get('verification_note','') for r in records]
     return df
 
 @st.cache_data(show_spinner=False,max_entries=200)
@@ -99,10 +102,16 @@ def render_app():
     discover,wishlist,notebook,insights,about=st.tabs(['Discover your matches',f'My Wishlist ({len(st.session_state.routine)})','Ingredient Notebook','ML Insights','Behind the glow'])
 
     def product_image(row,small=False):
+        gallery=row.get('photo_gallery',[])
+        if gallery:
+            pictures=''.join(f'<figure><img src="{image_uri(part["local_image"],thumbnail=True)}" alt="{escape(part["name"],quote=True)}" loading="lazy"></figure>' for part in gallery)
+            cls='notebook-product-photo' if small else 'product-photo'
+            return f'<div class="{cls} product-gallery">{pictures}<span class="photo-badge">{escape(row.photo_note)}</span></div>'
         src=image_uri(row.local_image,thumbnail=True) if row.local_image else ''
         if src:
             cls='notebook-product-photo' if small else 'product-photo'
-            return f'<div class="{cls}"><img src="{src}" alt="{escape(str(row.brand)+" "+str(row["name"]),quote=True)}" loading="lazy"></div>'
+            note=f'<span class="photo-badge">{escape(str(row.get("photo_note","")))}</span>' if row.get('photo_note','') else ''
+            return f'<div class="{cls}"><img src="{src}" alt="{escape(str(row.brand)+" "+str(row["name"]),quote=True)}" loading="lazy">{note}</div>'
         return '<div class="photo-missing"><span>✿</span><strong>Photo not verified</strong><small>Original product photography is being checked.</small></div>'
 
     def wishlist_button(row,prefix):
@@ -180,6 +189,9 @@ def render_app():
                         with st.expander('Ingredients & photo source'):
                             full_ingredients(row)
                             if row.photo_source:st.link_button('View photo source',row.photo_source,width='stretch')
+                            if row.photo_documentation:st.caption(row.photo_documentation)
+                            for part in row.photo_gallery:
+                                st.link_button(part['name']+' photo source',part['source_url'])
                             st.caption('Product data and PKR prices are from the project export. Packaging editions and sizes may differ.')
             prev,number,nxt=st.columns([1,3,1])
             if prev.button('Previous',disabled=st.session_state.page==0,width='stretch'):
@@ -297,6 +309,7 @@ def render_app():
             st.caption('These percentages describe recorded feature frequency within this group; they are not ingredient concentrations or feature-importance scores.')
         st.markdown('#### Photo provenance')
         st.write(f'{int(products.has_photo.sum()):,} of {len(products):,} product records have locally saved, sourced product images. Sources include brand sites, retailers, and ingredient catalogs. Each photographed card links to its source; generic skincare photography is reserved for the editorial sections.')
+        st.caption(f'{int(products.photo_verified.sum()):,} records have verified product or documented set-content images. One Algenist reference gallery has an unconfirmed dataset edition and is excluded from Verified photos only.')
         with st.expander('For your project presentation: reproducibility'):
             st.write('Phase 1: ingredient preparation and TF-IDF. Phase 2: saved K-means groups. Phase 3: saved KNN skin-label predictions. Phase 4: live reference-product ranking in this app.')
             st.write(f'Verified matrix-to-catalog row alignment: {d["products"]:,} rows × {d["tfidf_features"]:,} features. The app stops with an error if the feature rows and catalog no longer align.')

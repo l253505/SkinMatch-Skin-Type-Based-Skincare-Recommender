@@ -50,7 +50,9 @@ def filter_catalog(df,skin,budget,category='All products',query='',brands=(),exc
     if brands:matches=matches[matches.brand.isin(brands)]
     for exclusion in exclusions:
         matches=matches[pd.to_numeric(matches[exclusion],errors='coerce').fillna(0)<.5]
-    if photo_only and 'has_photo' in matches:matches=matches[matches.has_photo]
+    if photo_only and 'has_photo' in matches:
+        photo_flag='photo_verified' if 'photo_verified' in matches else 'has_photo'
+        matches=matches[matches[photo_flag]]
     return matches
 
 class RecommendationEngine:
