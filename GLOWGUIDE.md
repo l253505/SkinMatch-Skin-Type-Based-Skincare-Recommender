@@ -21,9 +21,13 @@ python -m streamlit run app.py
 
 `recommendation_engine.py` loads 2,724 records and the saved 2,724 by 7,316 TF-IDF matrix. It verifies row identity against `skincare_clean.csv` before ranking.
 
-Eligible products must match the selected skin type, budget, and filters. Phase 4 excludes the reference itself, counts shared flags among six tracked key ingredients, computes TF-IDF cosine similarity, removes zero-overlap candidates, and sorts by shared-flag count first and cosine similarity second. Displayed percentages are calculated from the matrix.
+Eligible products must match the selected skin type, budget, and filters. Phase 4 excludes the reference itself, computes TF-IDF cosine similarity, counts shared flags among ten tracked key ingredients (niacinamide, zinc, salicylic acid, ceramides, hyaluronic acid, squalane, retinoids, vitamin C, AHAs, UV filters), and ranks by one score:
 
-The app uses original labels for 1,552 records and saved KNN-inferred labels for 1,162 records. Nine exported K-means groups describe 11 binary ingredient features. Group membership is explanatory context and does not change Phase 4 ranking. KNN and K-means training remains in the notebooks; the app uses their saved outputs.
+`Score = cosine similarity + 0.05 × shared key ingredients + 0.03 × same K-means group`
+
+Candidates with a cosine similarity below 0.08 are not recommended, because they share little beyond base ingredients such as water and glycerin. Sun-protection results exclude self-tanners. Displayed percentages are calculated from the matrix.
+
+The app uses original labels for 1,557 records and saved Logistic Regression predictions for 1,167 records. Logistic Regression (balanced class weights, C = 2) was selected over KNN because it achieved the higher Macro F1 (0.728 vs 0.712) and found far more acne-prone products. Ten exported K-means groups were built on TF-IDF reduced with TruncatedSVD (K-Means was selected over DBSCAN). Group membership adds a small +0.03 to the ranking score. Model training remains in the notebooks; the app uses their saved outputs.
 
 Ingredient presence does not establish concentration. Cosine similarity is not a probability of safety, efficacy, or skin suitability. PKR prices are dataset estimates rather than live retail quotes.
 

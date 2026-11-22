@@ -138,10 +138,10 @@ def render_app():
             c1,c2=st.columns([1,5])
             c1.markdown(product_image(reference,small=True),unsafe_allow_html=True)
             c2.markdown(f'<div class="reference-note"><span class="eyebrow">YOUR INGREDIENT REFERENCE</span><h3>{escape(reference["name"])}</h3><p>{escape(reference.brand)} · {escape(reference.category)} · {money(reference.price_pkr)}</p><span class="product-tag">K-means group C{int(reference.Cluster)}</span></div>',unsafe_allow_html=True)
-            st.caption('Matches follow Phase 4: shared key ingredients first, then cosine similarity. Your skin profile and budget filter the candidate products.')
+            st.caption('Matches follow Phase 4: ranked by ingredient cosine similarity, with a small bonus for each shared key ingredient (+0.05) and for the same K-means ingredient group (+0.03). Products below 8% similarity are not shown. Your skin profile and budget filter the candidate products.')
         else:
             st.caption('Browse the collection using your skin profile and preferences. Choose “Find similar products” for a calculated ingredient comparison.')
-        st.caption('A match is a starting point: recorded labels and KNN predictions can be incomplete or incorrect. Ingredient similarity does not guarantee suitability. Open ML Insights to see model evaluation and limitations.')
+        st.caption('A match is a starting point: recorded labels and Logistic Regression predictions can be incomplete or incorrect. Ingredient similarity does not guarantee suitability. Open ML Insights to see model evaluation and limitations.')
         c1,c2,c3=st.columns([2,1.3,1.3])
         query=c1.text_input('Search products or ingredients',placeholder='Brand, product, or ingredient…',key='catalog_search')
         category=c2.selectbox('Product category',['All products']+sorted(products.category.unique()))
@@ -160,7 +160,7 @@ def render_app():
             results['Goal_Matches']=results.apply(lambda r:sum(flag(r,CONCERNS[c]) for c in concerns),axis=1)
             results=results.sort_values('Goal_Matches',ascending=False,kind='stable')
         st.caption(f'{len(results):,} matching products · {skin} skin · budget up to {money(budget)}')
-        if results.empty:st.info('No matches in this edit. Try a higher budget, fewer filters, or another reference product.')
+        if results.empty:st.info('No matches in this edit. Try a higher budget, fewer filters, or another reference product. When a reference product is selected, only products with at least 8% ingredient similarity are shown.')
         else:
             pages=(len(results)+8)//9;st.session_state.page=min(st.session_state.page,pages-1)
             visible=results.iloc[st.session_state.page*9:(st.session_state.page+1)*9]
@@ -175,8 +175,9 @@ def render_app():
                             with st.expander('See the match evidence'):
                                 st.write(f'Compared with {reference.brand} · {reference["name"]}.')
                                 st.write(f'TF-IDF cosine similarity: {float(row.Similarity):.6f} on a 0–1 scale. The percentage is this value × 100, not a suitability probability.')
-                                st.write(f'Key-ingredient priority: {int(row.Shared_Actives)} of the reference product’s recorded key flags are shared.')
-                                st.write(('Same K-means ingredient group' if explanation['same_cluster'] else 'Different K-means ingredient group')+f': candidate C{explanation["cluster"]}, reference C{explanation["reference_cluster"]}. Groups are context, not an extra ranking weight.')
+                                st.write(f'Shared key ingredients: {int(row.Shared_Actives)} of the reference product’s ten tracked key-ingredient flags are shared (+0.05 each).')
+                                st.write(f'Ranking score: {float(row.Score):.3f} = similarity {float(row.Similarity):.3f} + 0.05 × {int(row.Shared_Actives)} shared key ingredients + 0.03 × same K-means group ({int(row.Same_Cluster)}).')
+                                st.write(('Same K-means ingredient group' if explanation['same_cluster'] else 'Different K-means ingredient group')+f': candidate C{explanation["cluster"]}, reference C{explanation["reference_cluster"]}. The same group adds a small +0.03 to the ranking score.')
                                 st.write('Shared ingredient entries')
                                 st.markdown(chips(explanation['common_ingredients']),unsafe_allow_html=True)
                                 if not explanation['shared_actives']:st.caption('This is a general ingredient-similarity match; no tracked key-ingredient flags are shared.')
@@ -272,17 +273,28 @@ def render_app():
                     leaders=comparison.loc[np.isclose(scores,best,rtol=0,atol=1e-12),'Model'].astype(str).tolist()
                     conclusions.append(f'{metric}: {" and ".join(leaders)} {"tie" if len(leaders)>1 else "leads"} ({best:.3f}).')
             st.success(' '.join(conclusions))
-            knn=comparison.loc[comparison.Model.eq('KNN')]
-            if not knn.empty:
-                st.warning(f'KNN Macro F1 is {float(knn.iloc[0]["Macro F1"]):.3f} on the reported validation split. Performance varies across skin labels; this average does not mean every label performs equally well. Predictions may be wrong and are not a guarantee that a product will suit your skin.')
-            st.caption('Reported validation scores from model_comparison.csv. Accuracy requires all six labels to match for a product. Micro F1 aggregates label decisions; Macro F1 gives each skin-type label equal weight. These scores are not individual product suitability probabilities.')
+            lr=comparison.loc[comparison.Model.eq('Logistic Regression')]
+            if not lr.empty:
+                st.info(f'Logistic Regression was selected for predicting skin types of unlabelled products: it has the highest Macro F1 ({float(lr.iloc[0]["Macro F1"]):.3f}), which gives every skin type equal weight, and finds far more acne-prone products than KNN. KNN has a slightly higher Micro F1 because it predicts the common skin types more often.')
+                st.warning('Performance varies across skin labels; sensitive and acne-prone are the hardest to predict. Predictions may be wrong and are not a guarantee that a product will suit your skin.')
+            st.caption('Test-set scores from model_comparison.csv. Accuracy requires all six labels to match for a product. Micro F1 aggregates label decisions; Macro F1 gives each skin-type label equal weight. These scores are not individual product suitability probabilities.')
         else:
             st.info('Add model_comparison.csv to see the model evaluation results.')
+        efficiency_path=ROOT/'model_efficiency.csv'
+        if efficiency_path.exists():
+            st.subheader('Speed, overfitting and model size')
+            st.dataframe(pd.read_csv(efficiency_path),hide_index=True,width='stretch')
+            st.caption('Gap = training Macro F1 minus test Macro F1; a larger gap means more overfitting. KNN trains almost instantly because it only stores the training data, but it is larger and slower at prediction time. Logistic Regression overfits more, yet still performs better on unseen products.')
+        clustering_path=ROOT/'clustering_comparison.csv'
+        if clustering_path.exists():
+            st.subheader('K-Means vs DBSCAN')
+            st.dataframe(pd.read_csv(clustering_path),hide_index=True,width='stretch')
+            st.caption('ARI and NMI compare clusters with real labels (higher = closer match). K-Means relates more to product category; DBSCAN labels about half of the products as noise and its clusters mostly group products of the same brand. K-Means was selected.')
         st.markdown('#### Products per ingredient group')
         counts=products.Cluster.value_counts().sort_index()
         counts.index=[f'C{int(i)}' for i in counts.index]
         st.bar_chart(counts,color='#C96C95')
-        st.caption('KNN supplies saved predictions for unlabelled products. K-means groups ingredient patterns; the group number is not a quality score. See Behind the glow for the complete recommendation pipeline.')
+        st.caption('Logistic Regression supplies saved predictions for unlabelled products. K-means groups ingredient patterns; the group number is not a quality score. See Behind the glow for the complete recommendation pipeline.')
 
     with about:
         st.markdown('### The intelligence behind GlowGuide')
@@ -290,10 +302,10 @@ def render_app():
         d=engine.diagnostics
         c1,c2,c3=st.columns(3)
         c1.metric('Original skin-label records',f'{d["labeled_products"]:,}')
-        c2.metric('KNN-inferred label records',f'{d["knn_inferred_products"]:,}')
+        c2.metric('Predicted label records (Logistic Regression)',f'{d["predicted_label_products"]:,}')
         c3.metric('Ingredient-profile groups',d['clusters'])
         st.markdown('#### How a recommendation is made')
-        for title,text in [('Your skin profile','Products must match the selected skin type and budget. Original skin labels are used where available; the saved KNN predictions supply labels for unlabelled products.'),('Your ingredient reference',f'Choose a product to compare. Its ingredient list is represented in the project’s {d["tfidf_features"]:,}-feature TF-IDF vocabulary, and cosine similarity is calculated live against eligible products.'),('Your Phase 4 ranking','Products sharing more of the six tracked key-ingredient flags rank first. Within each shared-flag count, higher cosine similarity ranks first. The reference itself and zero-overlap results are excluded.'),('Your K-means context',f'The saved K-means export contains {d["clusters"]} ingredient-profile groups. Group IDs describe ingredient patterns; they are not skin diagnoses or skin-type names.')]:
+        for title,text in [('Your skin profile','Products must match the selected skin type and budget. Original skin labels are used where available; saved Logistic Regression predictions supply labels for unlabelled products.'),('Your ingredient reference',f'Choose a product to compare. Its ingredient list is represented in the project’s {d["tfidf_features"]:,}-feature TF-IDF vocabulary, and cosine similarity is calculated live against eligible products.'),('Your Phase 4 ranking','Score = cosine similarity + 0.05 for each shared key ingredient (of ten tracked flags) + 0.03 for the same K-means group. Similarity carries most of the weight. The reference itself and products below 8% similarity are excluded.'),('Your K-means context',f'The saved K-means export contains {d["clusters"]} ingredient-profile groups. Group IDs describe ingredient patterns; they are not skin diagnoses or skin-type names.')]:
             with st.container(border=True):st.markdown('**'+title+'**');st.write(text)
         st.markdown('#### Inside the ingredient groups')
         counts=products.Cluster.value_counts().sort_index()
@@ -311,10 +323,10 @@ def render_app():
         st.write(f'{int(products.has_photo.sum()):,} of {len(products):,} product records have locally saved, sourced product images. Sources include brand sites, retailers, and ingredient catalogs. Each photographed card links to its source; generic skincare photography is reserved for the editorial sections.')
         st.caption(f'{int(products.photo_verified.sum()):,} records have verified product or documented set-content images. One Algenist reference gallery has an unconfirmed dataset edition and is excluded from Verified photos only.')
         with st.expander('For your project presentation: reproducibility'):
-            st.write('Phase 1: ingredient preparation and TF-IDF. Phase 2: saved K-means groups. Phase 3: saved KNN skin-label predictions. Phase 4: live reference-product ranking in this app.')
+            st.write('Phase 1: ingredient preparation and TF-IDF. Phase 2: K-means groups on TF-IDF reduced with TruncatedSVD (compared with DBSCAN). Phase 3: Logistic Regression skin-label predictions (compared with KNN). Phase 4: live reference-product ranking in this app.')
             st.write(f'Verified matrix-to-catalog row alignment: {d["products"]:,} rows × {d["tfidf_features"]:,} features. The app stops with an error if the feature rows and catalog no longer align.')
             st.latex(r'\operatorname{cosine}(a,b)=\frac{a\cdot b}{\lVert a\rVert_2\lVert b\rVert_2}')
-            st.write('KNN and K-means training remain in the project notebooks. The app uses their exported results; it does not claim to retrain models for each visit. K-means group similarity is explanatory context and does not change Phase 4 ranking.')
+            st.write('Model training remains in the project notebooks. The app uses their exported results; it does not retrain models for each visit. The same K-means group adds only a small +0.03 to the ranking score.')
             st.write('Cosine percentages measure ingredient-vector similarity. They are not probabilities of safety, effectiveness, or skin suitability. Ingredient presence does not reveal concentration.')
         st.caption('PKR prices are dataset estimates, not live retail quotes. Check current product labels and patch test new products. Editorial images were created for GlowGuide and are separate from sourced product photos.')
     st.markdown('<div class="footer"><span>glowguide ✿ &nbsp; A little care goes a long way.</span><span>Made for your own kind of glow.</span></div>',unsafe_allow_html=True)

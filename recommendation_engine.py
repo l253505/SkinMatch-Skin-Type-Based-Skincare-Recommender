@@ -1,7 +1,11 @@
 """GlowGuide's reproducible Phase 4 recommendation engine.
 
-KNN labels and K-means groups are read from the trained notebook exports.
-Reference-product similarity and ranking are computed at request time.
+Logistic Regression labels and K-means groups are read from the trained notebook exports.
+Reference-product similarity and ranking are computed at request time, exactly as in
+recommend_products() in 04_recommendation_system.ipynb:
+
+    Score = cosine similarity + 0.05 x shared key ingredients + 0.03 x same K-means group
+    Products with cosine similarity below MIN_SIMILARITY are not recommended.
 """
 from pathlib import Path
 import numpy as np
@@ -17,9 +21,17 @@ KEY_INGREDIENTS = {
     'has_ceramide':'Ceramides',
     'has_hyaluronic':'Hyaluronic acid',
     'has_squalane':'Squalane',
+    'has_retinoid':'Retinoids',
+    'has_vitamin_c':'Vitamin C',
+    'has_aha':'AHAs',
+    'has_uv_filter':'UV filters',
 }
+ACTIVE_BONUS=0.05      # per shared key ingredient
+CLUSTER_BONUS=0.03     # same K-means ingredient group
+MIN_SIMILARITY=0.08    # below this, products share little beyond base ingredients
 CONCERNS = {'Dehydration':'helps_dryness','Breakouts':'helps_acne','Excess oil':'helps_oil_control','Redness':'helps_redness'}
-BASIC_FEATURES = list(KEY_INGREDIENTS) + ['has_clay','has_heavy_oil_butter','has_fragrance','has_alcohol_denat','has_essential_oil']
+BASIC_FEATURES = ['has_niacinamide','has_zinc','has_salicylic_acid','has_ceramide','has_hyaluronic','has_squalane',
+                  'has_clay','has_heavy_oil_butter','has_fragrance','has_alcohol_denat','has_essential_oil']
 
 def flag(row,column):
     try:return float(row.get(column,0) or 0)>=.5
@@ -29,7 +41,7 @@ def ingredients(row):
     return {x.strip().casefold() for x in str(row['ingredients_clean']).split('|') if x.strip()}
 
 def label_source(row):
-    return 'Product label' if flag(row,'has_skin_label') else 'KNN prediction'
+    return 'Product label' if flag(row,'has_skin_label') else 'Logistic Regression prediction'
 
 def skin_matches(row,skin):
     suffix=SKIN_TYPES.get(skin,skin)
@@ -43,7 +55,11 @@ def filter_catalog(df,skin,budget,category='All products',query='',brands=(),exc
     if category not in ('All products','All'):
         matches=matches[matches.category.str.casefold()==category.casefold()]
     if category.casefold()=='sun protection':
-        matches=matches[matches['name'].str.contains('SPF|sunscreen|sunblock|broad spectrum',case=False,na=False)]
+        is_sunscreen=matches['name'].str.contains('SPF|sunscreen|sunblock|broad spectrum|UV',case=False,na=False)
+        if 'has_uv_filter' in matches:
+            is_sunscreen=is_sunscreen|(pd.to_numeric(matches['has_uv_filter'],errors='coerce').fillna(0)==1)
+        is_tanner=matches['name'].str.contains('tan|bronz',case=False,na=False)
+        matches=matches[is_sunscreen&~is_tanner]
     if query.strip():
         text=matches.brand+' '+matches['name']+' '+matches.ingredients_clean
         matches=matches[text.str.contains(query.strip(),case=False,regex=False)]
@@ -79,23 +95,29 @@ class RecommendationEngine:
             raise ValueError('The ingredient matrix and catalog have different row counts.')
         if not np.isfinite(self.matrix.data).all():
             raise ValueError('The ingredient matrix contains invalid numerical values.')
+        missing=[c for c in KEY_INGREDIENTS if c not in self.catalog]
+        if missing:
+            raise ValueError('skinmatch_recommendations.csv is missing '+', '.join(missing)+'. Re-run 04_recommendation_system.ipynb.')
         self.actives=self.catalog[list(KEY_INGREDIENTS)].apply(pd.to_numeric,errors='coerce').fillna(0).astype(int)
         self.cluster_count=int(self.catalog.Cluster.nunique())
 
-    def rank(self,candidates,reference_index):
+    def rank(self,candidates,reference_index,min_similarity=MIN_SIMILARITY):
         reference_index=int(reference_index)
         if reference_index not in self.catalog.index:raise ValueError('Unknown reference product')
         result=candidates.loc[candidates.index!=reference_index].copy()
         if result.empty:
-            result['Similarity']=pd.Series(dtype=float)
-            result['Shared_Actives']=pd.Series(dtype=int)
+            for column,dtype in [('Similarity',float),('Shared_Actives',int),('Same_Cluster',int),('Score',float)]:
+                result[column]=pd.Series(dtype=dtype)
             return result
         reference_flags=self.actives.loc[reference_index]
         selected=reference_flags.index[reference_flags==1].tolist()
         result['Similarity']=np.clip(cosine_similarity(self.matrix[reference_index],self.matrix[result.index.to_numpy(dtype=int)])[0],0,1)
         result['Shared_Actives']=self.actives.loc[result.index,selected].sum(axis=1).astype(int) if selected else 0
-        result=result[(result.Shared_Actives>0)|(result.Similarity>0)]
-        return result.sort_values(['Shared_Actives','Similarity'],ascending=[False,False],kind='stable')
+        reference_cluster=int(self.catalog.loc[reference_index,'Cluster'])
+        result['Same_Cluster']=(pd.to_numeric(result['Cluster'],errors='coerce')==reference_cluster).astype(int)
+        result['Score']=result.Similarity+ACTIVE_BONUS*result.Shared_Actives+CLUSTER_BONUS*result.Same_Cluster
+        result=result[result.Similarity>=min_similarity]
+        return result.sort_values('Score',ascending=False)
 
     def explain(self,row,reference_index,skin):
         reference=self.catalog.loc[int(reference_index)]
@@ -115,4 +137,4 @@ class RecommendationEngine:
         labeled=pd.to_numeric(self.catalog.has_skin_label,errors='coerce').fillna(0).eq(1)
         return {'products':len(self.catalog),'tfidf_features':self.matrix.shape[1],
                 'clusters':self.cluster_count,'labeled_products':int(labeled.sum()),
-                'knn_inferred_products':int((~labeled).sum()),'alignment_verified':True}
+                'predicted_label_products':int((~labeled).sum()),'alignment_verified':True}
